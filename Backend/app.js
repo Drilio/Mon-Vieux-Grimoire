@@ -1,13 +1,21 @@
+//import de express
 const express = require('express');
+//import de MongoDB
+const mongoose = require('mongoose');
 
+const bookRoutes = require('./routes/book');
 const app = express();
+
+mongoose.connect('mongodb+srv://antoineroy92:test123@clustervieuxgrimoire.wfdhr4u.mongodb.net/?retryWrites=true&w=majority',
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+    .then(() => console.log('Connexion à MongoDB réussie !'))
+    .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 //donne accès au corps de la requête en format json
 app.use(express.json());
-
-//Accède aux données data.json qui contient les livres
-const books = require('../Frontend/public/data/data.json')
-
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,18 +24,7 @@ app.use((req, res, next) => {
     next();
 })
 
-app.post('/api/Ajouter', (req, res, next) => {
-    console.log(req.body);
-    res.status(201).json({
-        message: 'Objet créé, enfin non mais oui'
-    });
-})
+app.use('/api/book', bookRoutes);
 
-
-app.get('/api/books', (req, res, next) => {
-    books;
-    res.status(200).json(books);
-    next();
-});
 
 module.exports = app;
