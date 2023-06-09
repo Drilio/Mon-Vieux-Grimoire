@@ -12,6 +12,6 @@ module.exports = (req, res, next) => {
             userId: userId
         };
     } catch {
-        res.status(401).json({ error });
+        (error) => res.status(401).json({ error });
     }
 };
