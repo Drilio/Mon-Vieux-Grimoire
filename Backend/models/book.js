@@ -7,7 +7,21 @@ const bookSchema = mongoose.Schema({
     imageUrl: { type: String, required: true },
     year: { type: Number, required: true },
     genre: { type: String, required: true },
-    rate: { type: Number, required: true }
-});
+    ratings: [
+        {
+            userId: String,
+            grade: Number
+        }],
+    averageRating: {
+        type: Number, default: function () {
+            const myArray = this.ratings;
+            let sum = 0;
+            myArray.forEach(element => {
+                sum += element.grade;
+            });
+            return sum / myArray.length || 0;
+        }
+    }
+})
 
 module.exports = mongoose.model('Book', bookSchema);
