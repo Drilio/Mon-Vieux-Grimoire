@@ -77,9 +77,14 @@ exports.getOneBook = (req, res, next) => {
         .catch(error => res.status(404).json({ error }));
 }
 
-exports.bestRated = (req, res, next) => {
-    console.log("bestRated");
+exports.bestrating = (req, res, next) => {
+    console.log("bestrating");
     Book.find()
-        .then(books => res.status(200).json(books.find().sort(1)))
-        .catch(error = res.status(400).json({ error }))
+        .then((books) => {
+            const sortedBooks = books.sort((a, b) => b.averagerating - a.averagerating)
+            const topBooks = sortedBooks.slice(0, 3);
+            return topBooks;
+        })
+        .then(finalSort => res.status(200).json(finalSort))
+        .catch(error => res.status(400).json({ error }))
 }
