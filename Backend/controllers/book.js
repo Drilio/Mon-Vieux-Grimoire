@@ -6,10 +6,12 @@ exports.createBook = (req, res, next) => {
     delete bookObject._id;
     console.log('controller')
     delete bookObject._userId;
+    let newFileName = req.file.filename;
+    newFileName = newFileName.split('.')[0];
     const book = new Book({
         ...bookObject,
         userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}.webp`
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${newFileName}.webp`
     });
 
     book.save()

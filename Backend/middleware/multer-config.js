@@ -6,9 +6,11 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, callback) => {
         let mimetype = file.mimetype;
+        console.log("multer")
         mimetype = mimetype.split('/')[1];
         let name = file.originalname.split(' ').join('_');
         name = name.split(`.${mimetype}`)[0];
+        console.log(name);
         callback(null, name + Date.now() + '.' + mimetype);
     }
 });
