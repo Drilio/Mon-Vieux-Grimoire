@@ -17,7 +17,13 @@ exports.createBook = (req, res, next) => {
     book.save()
         .then(() => {
             res.status(201).json({ message: 'Object enregistré !' });
-            fs.unlinkSync(req.file.path);
+            try {
+                console.log(req.file.path)
+                fs.unlinkSync(`./${req.file.path}`);
+            }
+            catch (error) {
+                console.log(error)
+            }
         })
         .catch(error => {
             res.status(400).json({ error });
@@ -89,4 +95,15 @@ exports.bestrating = (req, res, next) => {
         })
         .then(finalSort => res.status(200).json(finalSort))
         .catch(error => res.status(400).json({ error }))
+}
+
+exports.rating = (req, res, next) => {
+    console.log('rating')
+    Book.findOne({ _id: req.params.id })
+        .then((book) => {
+            const ratings = book.ratings;
+            const myRating = req.rating;
+            const user = req.userId;
+            book.ratings.push(myRating);
+        })
 }
