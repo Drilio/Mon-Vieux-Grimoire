@@ -1,17 +1,12 @@
 const sharp = require('sharp');
+const fs = require("fs");
+const path = require("path");
 
 module.exports = (req, res, next) => {
-    console.log(req.file.filename);
     try {
-        console.log('Sharp test')
-        let newFileName = req.file.filename;
-        //split au niveau du minetype
-        let mimetype = req.file.mimetype;
-        mimetype = mimetype.split('/')[1];
-        //récupération du nom uniquement
-        newFileName = path.parse(newFileName).name;
-        console.log(newFileName)
-        if (mimetype == "webp") {
+        let filePathObject = path.parse(req.file.filename);
+
+        if (filePathObject.ext == ".webp") {
             //retailler l'image
             sharp()
                 .resize({
@@ -20,6 +15,9 @@ module.exports = (req, res, next) => {
                 })
             next();
         } else {
+            let newPath = `images/${filePathObject.name}.webp`;
+            let newFileName = `${filePathObject.name}.webp`
+
             //retailler l'image + conversion en webp
             sharp(req.file.path)
                 .webp({ quality: 80 })
@@ -27,17 +25,17 @@ module.exports = (req, res, next) => {
                     width: 500,
                     height: 500
                 })
-                .toFile(`images/${newFileName}.webp`)
+                .toFile(newPath, function () {
+                    fs.unlinkSync(`./images/${req.file.filename}`);
+                    req.file = {
+                        filename: newFileName
+                    };
+                    next();
+                })
                 .catch(error => {
                     res.status(400).json({ error });
                 });
-
-            next();
         }
-        req.file = {
-            filename: newFileName
-        };
-        //passer le nom via la req comme dans auth.js
     } catch {
         (error) => res.status(401).json({ error });
     }

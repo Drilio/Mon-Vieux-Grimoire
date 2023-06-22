@@ -4,26 +4,17 @@ const fs = require('fs');
 exports.createBook = (req, res, next) => {
     const bookObject = JSON.parse(req.body.book);
     delete bookObject._id;
-    console.log('controller')
     delete bookObject._userId;
-    let newFileName = req.file.filename;
+
     const book = new Book({
         ...bookObject,
         userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${newFileName}`
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
-    const oldPath = req.file.path
-    book.save(oldPath)
-        .then((oldPath) => {
-            console.log(oldPath.imageUrl)
+
+    book.save()
+        .then(() => {
             res.status(201).json({ message: 'Object enregistré !' });
-            try {
-                console.log(oldPath.imageUrl)
-                fs.unlinkSync(oldPath.imageUrl);
-            }
-            catch (error) {
-                console.log(error)
-            }
         })
         .catch(error => {
             res.status(400).json({ error });
@@ -99,12 +90,16 @@ exports.bestrating = (req, res, next) => {
 }
 
 exports.rating = (req, res) => {
-    console.log("test")
-    const id = req.params.id
-    const userId = req.userId;
-    const rating = req.rating;
-    console.log(userId, rating)
-    res.send(req.params.id);
-    //a faire 
-    fs.appendFile(data, rating, err => { })
+    Book.findOne({ _id: req.params.id })
+        .then(book => {
+            console.log("test")
+            const myRatings = book.ratings;
+            const myObject = JSON.parse(myRatings)
+            const newRating = req.body;
+            myObject.push(newRating);
+            console.log(myObject);
+            const newData = JSON.stringify(myObject);
+        })
+        .catch(error => res.status(400).json({ error }))
+
 }
