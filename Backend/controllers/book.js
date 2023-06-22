@@ -7,19 +7,19 @@ exports.createBook = (req, res, next) => {
     console.log('controller')
     delete bookObject._userId;
     let newFileName = req.file.filename;
-    newFileName = newFileName.split('.')[0];
     const book = new Book({
         ...bookObject,
         userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${newFileName}.webp`
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${newFileName}`
     });
-
-    book.save()
-        .then(() => {
+    const oldPath = req.file.path
+    book.save(oldPath)
+        .then((oldPath) => {
+            console.log(oldPath.imageUrl)
             res.status(201).json({ message: 'Object enregistré !' });
             try {
-                console.log(req.file.path)
-                fs.unlinkSync(`./${req.file.path}`);
+                console.log(oldPath.imageUrl)
+                fs.unlinkSync(oldPath.imageUrl);
             }
             catch (error) {
                 console.log(error)
@@ -80,6 +80,7 @@ exports.getAllBooks = (req, res, next) => {
 
 exports.getOneBook = (req, res, next) => {
     console.log('testOneBook')
+    console.log(req.params.id);
     Book.findOne({ _id: req.params.id })
         .then(book => res.status(200).json(book))
         .catch(error => res.status(404).json({ error }));
@@ -97,13 +98,13 @@ exports.bestrating = (req, res, next) => {
         .catch(error => res.status(400).json({ error }))
 }
 
-exports.rating = (req, res, next) => {
-    console.log('rating')
-    Book.findOne({ _id: req.params.id })
-        .then((book) => {
-            const ratings = book.ratings;
-            const myRating = req.rating;
-            const user = req.userId;
-            book.ratings.push(myRating);
-        })
+exports.rating = (req, res) => {
+    console.log("test")
+    const id = req.params.id
+    const userId = req.userId;
+    const rating = req.rating;
+    console.log(userId, rating)
+    res.send(req.params.id);
+    //a faire 
+    fs.appendFile(data, rating, err => { })
 }
