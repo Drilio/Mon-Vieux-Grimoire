@@ -10,19 +10,10 @@ const bookSchema = mongoose.Schema({
     genre: { type: String, required: true },
     ratings: [
         {
+            grade: Number,
             userId: String,
-            grade: Number
         }],
-    averageRating: {
-        type: Number, default: function () {
-            const myArray = this.ratings;
-            let sum = 0;
-            myArray.forEach(element => {
-                sum += element.grade;
-            });
-            return sum / myArray.length || 0;
-        }
-    }
+    averageRating: { type: Number }
 })
 
 module.exports = mongoose.model('Book', bookSchema);

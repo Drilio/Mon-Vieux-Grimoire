@@ -5,7 +5,6 @@ exports.createBook = (req, res, next) => {
     const bookObject = JSON.parse(req.body.book);
     delete bookObject._id;
     delete bookObject._userId;
-
     const book = new Book({
         ...bookObject,
         userId: req.auth.userId,
@@ -92,13 +91,37 @@ exports.bestrating = (req, res, next) => {
 exports.rating = (req, res) => {
     Book.findOne({ _id: req.params.id })
         .then(book => {
-            console.log("test")
-            const myRatings = book.ratings;
-            const myObject = JSON.parse(myRatings)
-            const newRating = req.body;
-            myObject.push(newRating);
-            console.log(myObject);
-            const newData = JSON.stringify(myObject);
+
+            const newRating =
+            {
+                grade: parseInt(req.body.rating),
+                userId: req.body.userId
+            };
+            book.ratings.push(newRating);
+            return book.save()
+        })
+        .then(book => {
+
+            const calculateAverage = () => {
+                const myArray = book.ratings;
+                let sum = 0;
+                myArray.forEach(element => {
+                    sum += element.grade;
+                });
+                return Math.round(sum / myArray.length) || 0;
+            }
+
+            const newAverageRating = calculateAverage();
+
+            book.averageRating = parseInt(newAverageRating);
+
+            console.log(book)
+
+            return book.save()
+        })
+        .then(updateBook => {
+            console.log("New rating added :", updateBook);
+            res.json(updateBook);
         })
         .catch(error => res.status(400).json({ error }))
 

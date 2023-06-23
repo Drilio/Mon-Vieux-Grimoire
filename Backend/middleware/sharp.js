@@ -11,7 +11,6 @@ module.exports = (req, res, next) => {
             sharp()
                 .resize({
                     width: 500,
-                    height: 500
                 })
             next();
         } else {
@@ -23,7 +22,6 @@ module.exports = (req, res, next) => {
                 .webp({ quality: 80 })
                 .resize({
                     width: 500,
-                    height: 500
                 })
                 .toFile(newPath, function () {
                     fs.unlinkSync(`./images/${req.file.filename}`);
