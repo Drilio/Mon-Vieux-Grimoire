@@ -80,11 +80,12 @@ exports.bestrating = (req, res, next) => {
     console.log("bestrating");
     Book.find()
         .then((books) => {
-            const sortedBooks = books.sort((a, b) => b.averagerating - a.averagerating)
+            const sortedBooks = books.sort((a, b) => b.averageRating - a.averageRating)
+            console.log(sortedBooks)
             const topBooks = sortedBooks.slice(0, 3);
             return topBooks;
         })
-        .then(finalSort => res.status(200).json(finalSort))
+        .then(topBooks => res.status(200).json(topBooks))
         .catch(error => res.status(400).json({ error }))
 }
 
