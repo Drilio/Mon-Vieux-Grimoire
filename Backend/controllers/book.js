@@ -81,7 +81,6 @@ exports.bestrating = (req, res, next) => {
     Book.find()
         .then((books) => {
             const sortedBooks = books.sort((a, b) => b.averageRating - a.averageRating)
-            console.log(sortedBooks)
             const topBooks = sortedBooks.slice(0, 3);
             return topBooks;
         })
